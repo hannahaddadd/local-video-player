@@ -17,10 +17,14 @@ When your local media player fails you, check if this web-based media player doe
 - Two themes: Stylish and Retro
 - Keyboard shortcuts
 
-## Demo
+## Built with
 
-[hannahaddadd.github.io/local-video-player](https://hannahaddadd.github.io/local-video-player/)
+- [Video.js](https://videojs.com/) — HTML5 video player
 
 ## Usage
 
 Open `index.html` directly in your browser — no server needed.
+
+## Demo
+
+[hannahaddadd.github.io/local-video-player](https://hannahaddadd.github.io/local-video-player/)
