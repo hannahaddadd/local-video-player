@@ -1,0 +1,519 @@
+/* ── CSS Variables ──────────────────────────────────────────────────────── */
+:root {
+    --bg:               #06060a;
+    --surface:          rgba(255,255,255,0.04);
+    --surface-border:   rgba(255,255,255,0.08);
+    --surface-blur:     blur(20px);
+    --text:             #e2e2e8;
+    --text-muted:       #444;
+    --text-label:       #555;
+    --accent:           #818cf8;
+    --accent-dim:       rgba(129,140,248,0.15);
+    --accent-glow:      rgba(129,140,248,0.25);
+    --btn-bg:           rgba(255,255,255,0.05);
+    --btn-border:       rgba(255,255,255,0.1);
+    --btn-hover:        rgba(255,255,255,0.09);
+    --btn-active-bg:    rgba(129,140,248,0.18);
+    --btn-active-border:rgba(129,140,248,0.45);
+    --theater-bg:       #1e2a5c;
+    --theater-border:   #2d3f8a;
+    --theater-text:     #a5b4fc;
+    --font:             'Inter', system-ui, sans-serif;
+    --radius:           12px;
+    --radius-btn:       8px;
+    --radius-player:    12px;
+    --transition:       0.18s ease;
+    --playlist-active-border: #818cf8;
+    --playlist-active-bg:     rgba(129,140,248,0.08);
+    --waveform-bg:      #0d0d12;
+}
+
+:root[data-theme="retro"] {
+    --bg:               #090d09;
+    --surface:          #111811;
+    --surface-border:   #2a3d2a;
+    --surface-blur:     none;
+    --text:             #33ff41;
+    --text-muted:       #1a4d1f;
+    --text-label:       #2a7a30;
+    --accent:           #33ff41;
+    --accent-dim:       rgba(51,255,65,0.1);
+    --accent-glow:      rgba(51,255,65,0.3);
+    --btn-bg:           #1a1a1a;
+    --btn-border:       #3a3a3a;
+    --btn-hover:        #222;
+    --btn-active-bg:    #0d2e10;
+    --btn-active-border:#33ff41;
+    --theater-bg:       #0d2e10;
+    --theater-border:   #33ff41;
+    --theater-text:     #33ff41;
+    --font:             'VT323', monospace;
+    --radius:           0px;
+    --radius-btn:       0px;
+    --radius-player:    0px;
+    --transition:       0s;
+    --playlist-active-border: #33ff41;
+    --playlist-active-bg:     rgba(51,255,65,0.06);
+    --waveform-bg:      #050d05;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    transition: background var(--transition), color var(--transition);
+}
+
+/* ── Retro scanlines ─────────────────────────────────────────────────────── */
+:root[data-theme="retro"] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.12) 3px,
+        rgba(0,0,0,0.12) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* ── App layout ─────────────────────────────────────────────────────────── */
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: 20px;
+    gap: 12px;
+}
+
+#app.theater { padding: 0; }
+
+/* ── Top bar ─────────────────────────────────────────────────────────────── */
+.top-bar {
+    width: 90vw;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#app.theater .top-bar { display: none; }
+
+.theme-switcher {
+    display: flex;
+    gap: 6px;
+}
+
+.theme-btn {
+    padding: 4px 12px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--text-muted);
+    border-radius: var(--radius-btn);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    transition: all var(--transition);
+}
+
+.theme-btn:hover { background: var(--btn-hover); color: var(--text); }
+
+.theme-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+:root[data-theme="retro"] .theme-btn { font-size: 15px; letter-spacing: 1px; }
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font);
+    padding: 4px 8px;
+    border-radius: var(--radius-btn);
+    transition: color var(--transition);
+}
+
+:root[data-theme="retro"] .toggle-btn { font-size: 15px; }
+
+.toggle-btn:hover { color: var(--text); }
+
+/* ── Controls panel ─────────────────────────────────────────────────────── */
+.controls-panel {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    backdrop-filter: var(--surface-blur);
+    -webkit-backdrop-filter: var(--surface-blur);
+    padding: 16px 22px;
+    border-radius: var(--radius);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    align-items: flex-start;
+    width: 90vw;
+    max-width: 1200px;
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.controls-panel.collapsed { display: none; }
+
+:root[data-theme="retro"] .controls-panel {
+    border-width: 2px;
+    box-shadow: 0 0 12px rgba(51,255,65,0.08);
+}
+
+#app.theater .controls-panel { display: none; }
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.control-group > label {
+    font-size: 11px;
+    color: var(--text-label);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 500;
+}
+
+:root[data-theme="retro"] .control-group > label {
+    font-size: 14px;
+    letter-spacing: 2px;
+    font-weight: 400;
+}
+
+.control-group input[type="file"] {
+    font-size: 12px;
+    font-family: var(--font);
+    color: var(--text);
+    cursor: pointer;
+}
+
+:root[data-theme="retro"] .control-group input[type="file"] { font-size: 15px; }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+    padding: 5px 12px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--text);
+    border-radius: var(--radius-btn);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font);
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.btn:hover { background: var(--btn-hover); }
+
+.btn:disabled { opacity: 0.3; cursor: default; }
+.btn:disabled:hover { background: var(--btn-bg); }
+
+.btn.active {
+    background: var(--btn-active-bg);
+    border-color: var(--btn-active-border);
+    color: var(--accent);
+}
+
+:root[data-theme="retro"] .btn {
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,0.08), inset -1px -1px 0 rgba(0,0,0,0.6);
+}
+
+:root[data-theme="retro"] .btn:active {
+    box-shadow: inset -1px -1px 0 rgba(255,255,255,0.08), inset 1px 1px 0 rgba(0,0,0,0.6);
+}
+
+:root[data-theme="retro"] .btn.active { text-shadow: 0 0 8px var(--accent); }
+
+/* Theater button */
+.theater-btn {
+    padding: 6px 14px;
+    background: var(--theater-bg);
+    border: 1px solid var(--theater-border);
+    color: var(--theater-text);
+    border-radius: var(--radius-btn);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font);
+    transition: all var(--transition);
+}
+
+.theater-btn:hover { opacity: 0.85; }
+
+:root[data-theme="retro"] .theater-btn { font-size: 16px; letter-spacing: 0.5px; }
+
+/* ── Subtitle delay row ──────────────────────────────────────────────────── */
+.delay-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.delay-row span {
+    font-size: 13px;
+    color: var(--text);
+    min-width: 52px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+:root[data-theme="retro"] .delay-row span {
+    font-size: 17px;
+    color: var(--accent);
+    text-shadow: 0 0 6px var(--accent);
+}
+
+/* ── Keyboard shortcuts ──────────────────────────────────────────────────── */
+.shortcuts-list {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+:root[data-theme="retro"] .shortcuts-list { font-size: 14px; color: var(--text-label); }
+
+kbd {
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-family: monospace;
+    color: var(--text);
+}
+
+:root[data-theme="retro"] kbd {
+    font-family: var(--font);
+    font-size: 13px;
+    border-color: var(--text-muted);
+    color: var(--accent);
+}
+
+/* ── Main content (player + playlist) ───────────────────────────────────── */
+.main-content {
+    display: flex;
+    gap: 12px;
+    width: 90vw;
+    max-width: 1200px;
+    align-items: flex-start;
+}
+
+#app.theater .main-content { max-width: 100%; width: 100%; }
+
+/* ── Player ─────────────────────────────────────────────────────────────── */
+.player-wrapper {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+}
+
+.video-js {
+    width: 100%;
+    border-radius: var(--radius-player);
+    overflow: hidden;
+    transition: border-radius var(--transition);
+}
+
+:root:not([data-theme="retro"]) .video-js {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+:root[data-theme="retro"] .video-js {
+    border: 2px solid var(--accent) !important;
+    box-shadow: 0 0 20px var(--accent-glow), inset 0 0 30px rgba(51,255,65,0.03);
+}
+
+#app.theater .video-js { border-radius: 0; }
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+#emptyState {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+#emptyState.hidden { display: none; }
+
+.empty-icon { font-size: 48px; opacity: 0.12; }
+
+.empty-text { font-size: 13px; color: var(--text-muted); }
+
+:root[data-theme="retro"] .empty-icon { opacity: 0.4; font-size: 40px; }
+
+:root[data-theme="retro"] .empty-text {
+    font-size: 18px;
+    color: var(--text-label);
+    letter-spacing: 2px;
+}
+
+:root[data-theme="retro"] .empty-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 18px;
+    background: var(--accent);
+    margin-left: 3px;
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── Playlist panel ──────────────────────────────────────────────────────── */
+#playlistPanel {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    backdrop-filter: var(--surface-blur);
+    -webkit-backdrop-filter: var(--surface-blur);
+    border-radius: var(--radius);
+    display: none;
+    flex-direction: column;
+    max-height: 540px;
+}
+
+:root[data-theme="retro"] #playlistPanel {
+    border-width: 2px;
+    box-shadow: 0 0 10px rgba(51,255,65,0.06);
+}
+
+#app.theater #playlistPanel { display: none !important; }
+
+.playlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--surface-border);
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+:root[data-theme="retro"] .playlist-header { font-size: 15px; letter-spacing: 1px; }
+
+#playlistItems {
+    flex: 1;
+    overflow-y: auto;
+    list-style: none;
+    padding: 4px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-border) transparent;
+}
+
+#playlistItems::-webkit-scrollbar { width: 4px; }
+#playlistItems::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 2px; }
+
+.playlist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background var(--transition);
+}
+
+.playlist-item:hover { background: var(--surface-border); }
+
+.playlist-item.active {
+    border-left-color: var(--playlist-active-border);
+    background: var(--playlist-active-bg);
+}
+
+:root[data-theme="retro"] .playlist-item.active { text-shadow: 0 0 6px var(--accent); }
+
+.item-index {
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 16px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+:root[data-theme="retro"] .item-index { font-size: 14px; }
+
+.playlist-item.active .item-index { color: var(--accent); }
+
+.item-name {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+:root[data-theme="retro"] .item-name { font-size: 15px; }
+
+.playlist-item.active .item-name { color: var(--text); }
+
+.item-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+    font-family: var(--font);
+    opacity: 0.4;
+    transition: opacity var(--transition), color var(--transition);
+}
+
+.item-remove:hover { opacity: 1; color: #f87171; }
+
+.playlist-footer {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--surface-border);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.playlist-footer .btn { flex: 1; text-align: center; }
+
+/* ── Waveform ────────────────────────────────────────────────────────────── */
+#waveform {
+    width: 90vw;
+    max-width: 1200px;
+    height: 80px;
+    border-radius: var(--radius);
+    display: none;
+    background: var(--waveform-bg);
+}
+
+:root[data-theme="retro"] #waveform {
+    border: 2px solid var(--surface-border);
+    box-shadow: 0 0 8px rgba(51,255,65,0.05);
+}
+
+#app.theater #waveform { display: none !important; }

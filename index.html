@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Video Player</title>
+    <link href="video-js.css" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="app">
+
+        <div class="top-bar">
+            <div class="theme-switcher">
+                <button class="theme-btn" id="themeStylish">◆ Stylish</button>
+                <button class="theme-btn" id="themeRetro">▓ RETRO</button>
+            </div>
+            <button class="toggle-btn" id="toggleControlsBtn">▲ Settings</button>
+        </div>
+
+        <div class="controls-panel" id="controlsPanel">
+            <div class="control-group">
+                <label>Add to Playlist</label>
+                <input type="file" id="mediaInput" accept="video/*,audio/*,.mkv,.flac,.m4a,.aac" multiple>
+            </div>
+
+            <div class="control-group">
+                <label>Subtitles (.srt / .vtt)</label>
+                <input type="file" id="subtitleInput" accept=".srt,.vtt">
+                <div class="delay-row">
+                    <button class="btn" id="dm5">−0.5s</button>
+                    <button class="btn" id="dm1">−0.1s</button>
+                    <span id="delayDisplay">0.0s</span>
+                    <button class="btn" id="dp1">+0.1s</button>
+                    <button class="btn" id="dp5">+0.5s</button>
+                    <button class="btn" id="dreset">Reset</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>View</label>
+                <button class="theater-btn" id="theaterBtn">Theater Mode &nbsp;[T]</button>
+            </div>
+
+            <div class="control-group">
+                <label>Storage</label>
+                <button class="btn" id="clearCacheBtn">Clear cache</button>
+            </div>
+
+            <div class="control-group">
+                <label>Shortcuts</label>
+                <div class="shortcuts-list">
+                    <span><kbd>Space</kbd> Play/Pause &nbsp; <kbd>M</kbd> Mute &nbsp; <kbd>F</kbd> Fullscreen</span>
+                    <span><kbd>←</kbd> <kbd>→</kbd> Seek ±5s &nbsp;&nbsp; <kbd>J</kbd> <kbd>L</kbd> Seek ±10s</span>
+                    <span><kbd>↑</kbd> <kbd>↓</kbd> Volume &nbsp;&nbsp; <kbd>[</kbd> <kbd>]</kbd> Subtitle delay</span>
+                    <span><kbd>N</kbd> Next track &nbsp;&nbsp; <kbd>B</kbd> Previous track</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="player-wrapper">
+                <video id="player" class="video-js vjs-default-skin vjs-big-play-centered" controls
+                    preload="auto"></video>
+                <div id="emptyState">
+                    <div class="empty-icon">▶</div>
+                    <div class="empty-text" id="emptyText">Select a video or audio file to begin</div>
+                </div>
+            </div>
+
+            <div id="playlistPanel">
+                <div class="playlist-header">
+                    <span id="playlistCount">0 files</span>
+                    <button class="btn" id="clearPlaylist">Clear all</button>
+                </div>
+                <ul id="playlistItems"></ul>
+                <div class="playlist-footer">
+                    <button class="btn" id="prevTrack" title="Previous (B)">⏮</button>
+                    <button class="btn" id="nextTrack" title="Next (N)">⏭</button>
+                    <button class="btn" id="shuffleBtn" title="Shuffle">⇄ Shuffle</button>
+                    <button class="btn" id="loopBtn" title="Loop mode">↺ Off</button>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="waveform"></canvas>
+
+    </div>
+
+    <script src="video.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
