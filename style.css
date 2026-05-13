@@ -60,9 +60,14 @@
 /* ── Reset ──────────────────────────────────────────────────────────────── */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
-    width: 100%;
+html {
     height: 100%;
+}
+
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow-y: auto;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font);
@@ -312,6 +317,7 @@ kbd {
 /* ── Main content (player + playlist) ───────────────────────────────────── */
 .main-content {
     display: flex;
+    flex-direction: row;
     gap: 12px;
     width: 90vw;
     max-width: 1200px;
@@ -325,10 +331,17 @@ kbd {
     flex: 1;
     min-width: 0;
     position: relative;
+    aspect-ratio: 16 / 9;
 }
 
+/* Override vjs-fluid's height:0 — the wrapper's aspect-ratio owns the height */
 .video-js {
-    width: 100%;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    padding-top: 0 !important;
     border-radius: var(--radius-player);
     overflow: hidden;
     transition: border-radius var(--transition);
@@ -517,3 +530,82 @@ kbd {
 }
 
 #app.theater #waveform { display: none !important; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #app {
+        padding: 12px;
+        gap: 10px;
+        justify-content: flex-start;
+    }
+
+    .top-bar,
+    .controls-panel,
+    .main-content,
+    #waveform {
+        width: 100%;
+    }
+
+    .controls-panel {
+        gap: 18px;
+        padding: 14px 16px;
+    }
+
+    .main-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .player-wrapper {
+        width: 100%;
+    }
+
+    #playlistPanel {
+        width: 100%;
+        max-height: 300px;
+    }
+
+    .shortcuts-list span {
+        white-space: normal;
+        line-height: 1.6;
+    }
+
+    .delay-row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    #app {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .controls-panel {
+        gap: 14px;
+        padding: 12px;
+    }
+
+    .top-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .theme-switcher {
+        flex-wrap: wrap;
+    }
+
+    .delay-row .btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    .playlist-footer {
+        gap: 4px;
+    }
+
+    .playlist-footer .btn {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+}

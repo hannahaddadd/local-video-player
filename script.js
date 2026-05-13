@@ -28,6 +28,7 @@ const player = videojs('player', {
     autoplay: false,
     preload: 'auto',
     fluid: true,
+    aspectRatio: '16:9',
     playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
 });
 
