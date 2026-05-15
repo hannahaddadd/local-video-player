@@ -64,6 +64,25 @@ let currentSubLabel = '';
 let subtitleOffset  = 0;
 let lastSaveTime    = 0;
 let isAudioOnly     = false;
+let hlsInstance     = null;
+
+function destroyHls() {
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+}
+
+function playHLS(url) {
+    const videoEl = player.el().querySelector('video');
+    destroyHls();
+    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        hlsInstance = new Hls();
+        hlsInstance.loadSource(url);
+        hlsInstance.attachMedia(videoEl);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => player.play());
+    } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src({ src: url, type: 'application/x-mpegURL' });
+        player.play();
+    }
+}
 
 // ── Playlist ──────────────────────────────────────────────────────────────
 let playlist     = [];
@@ -84,21 +103,39 @@ function addToPlaylist(files) {
     }
 }
 
+function addStreamToPlaylist(url) {
+    const name = url.split('/').pop().split('?')[0] || 'stream.m3u8';
+    const wasEmpty = playlist.length === 0;
+    playlist.push({ name, url, isStream: true });
+    renderPlaylist();
+    if (wasEmpty) {
+        playAt(playlist.length - 1);
+        if (!autoCollapsed) { autoCollapsed = true; setControls(false); }
+    } else {
+        playAt(playlist.length - 1);
+    }
+}
+
 function playAt(index) {
     if (index < 0 || index >= playlist.length) return;
     currentIndex = index;
     const item = playlist[index];
 
     currentFileName = item.name;
-    isAudioOnly = item.file.type.startsWith('audio/') || /\.(mp3|flac|m4a|aac|wav|ogg)$/i.test(item.name);
+    isAudioOnly = !item.isStream && (item.file.type.startsWith('audio/') || /\.(mp3|flac|m4a|aac|wav|ogg)$/i.test(item.name));
 
     originalCues = null;
     currentSubLabel = '';
     const remoteTracks = player.remoteTextTracks();
     for (let i = remoteTracks.length - 1; i >= 0; i--) player.removeRemoteTextTrack(remoteTracks[i]);
 
-    player.src({ src: item.url, type: getMimeType(item.file) });
-    player.play();
+    if (item.isStream || /\.m3u8$/i.test(item.name)) {
+        playHLS(item.url);
+    } else {
+        destroyHls();
+        player.src({ src: item.url, type: getMimeType(item.file) });
+        player.play();
+    }
 
     if (isAudioOnly) {
         waveformCanvas.style.display = 'block';
@@ -227,6 +264,7 @@ function getMimeType(file) {
         mkv:'video/x-matroska', mov:'video/quicktime', avi:'video/x-msvideo',
         mp3:'audio/mpeg', wav:'audio/wav', ogg:'audio/ogg',
         flac:'audio/flac', m4a:'audio/mp4', aac:'audio/aac',
+        m3u8:'application/x-mpegURL',
     })[ext] || 'video/mp4';
 }
 
@@ -344,6 +382,18 @@ document.getElementById('dreset').onclick = () => {
     const track = getLoadedTrack();
     if (track) applyOffsetToCues(track);
 };
+
+// ── Stream URL ────────────────────────────────────────────────────────────
+document.getElementById('streamUrlBtn').onclick = () => {
+    const url = document.getElementById('streamUrlInput').value.trim();
+    if (!url) return;
+    addStreamToPlaylist(url);
+    document.getElementById('streamUrlInput').value = '';
+};
+
+document.getElementById('streamUrlInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('streamUrlBtn').click();
+});
 
 // ── Load media ────────────────────────────────────────────────────────────
 mediaInput.addEventListener('change', (e) => {

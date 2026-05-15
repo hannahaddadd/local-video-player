@@ -23,7 +23,15 @@
         <div class="controls-panel" id="controlsPanel">
             <div class="control-group">
                 <label>Add to Playlist</label>
-                <input type="file" id="mediaInput" accept="video/*,audio/*,.mkv,.flac,.m4a,.aac" multiple>
+                <input type="file" id="mediaInput" accept="video/*,audio/*,.mkv,.flac,.m4a,.aac,.m3u8" multiple>
+            </div>
+
+            <div class="control-group">
+                <label>Stream URL (.m3u8)</label>
+                <div class="url-row">
+                    <input type="text" id="streamUrlInput" placeholder="https://example.com/stream.m3u8" spellcheck="false">
+                    <button class="btn" id="streamUrlBtn">Load</button>
+                </div>
             </div>
 
             <div class="control-group">
@@ -90,6 +98,7 @@
     </div>
 
     <script src="video.min.js"></script>
+    <script src="hls.min.js"></script>
     <script src="script.js"></script>
 </body>
 
